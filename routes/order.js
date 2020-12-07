@@ -504,20 +504,20 @@ router.post("/ordercalcV3", async (req, res, next) => {
     if (totaldistance <= 5) {
         if (deliverytype == "Normal Delivery") {
             basickm = totaldistance;
-            basicamt = settings[0].PerUnder5KM;
+            basicamt = Number(settings[0].PerUnder5KM);
             extrakm = 0;
             extraamt = 0;
-            extadeliverycharges = delivery[0].cost;
+            extadeliverycharges = Number(delivery[0].cost);
             amount = basicamt + extraamt + extadeliverycharges;
             totalamt = amount;
         } else {
             for (let i = 1; i < delivery.length; i++) {
                 if (deliverytype == delivery[i].title) {
                     basickm = totaldistance;
-                    basicamt = settings[0].PerUnder5KM;
+                    basicamt = Number(settings[0].PerUnder5KM);
                     extrakm = 0;
                     extraamt = 0;
-                    extadeliverycharges = delivery[i].cost;
+                    extadeliverycharges = Number(delivery[i].cost);
                     amount = basicamt + extraamt + extadeliverycharges;
                     totalamt = amount;
                 }
@@ -527,10 +527,10 @@ router.post("/ordercalcV3", async (req, res, next) => {
         if (deliverytype == "Normal Delivery") {
             let remdis = totaldistance - 5;
             basickm = 5;
-            basicamt = settings[0].PerUnder5KM;
+            basicamt = Number(settings[0].PerUnder5KM);
             extrakm = remdis;
-            extraamt = remdis * settings[0].PerKM;
-            extadeliverycharges = delivery[0].cost;
+            extraamt = remdis * Number(settings[0].PerKM);
+            extadeliverycharges = Number(delivery[0].cost);
             amount = basicamt + extraamt + extadeliverycharges;
             totalamt = amount;
         } else {
@@ -538,10 +538,10 @@ router.post("/ordercalcV3", async (req, res, next) => {
                 if (deliverytype == delivery[i].title) {
                     let remdis = totaldistance - 5;
                     basickm = 5;
-                    basicamt = settings[0].PerUnder5KM;
+                    basicamt = Number(settings[0].PerUnder5KM);
                     extrakm = remdis;
-                    extraamt = remdis * settings[0].PerKM;
-                    extadeliverycharges = delivery[i].cost;
+                    extraamt = remdis * Number(settings[0].PerKM);
+                    extadeliverycharges = Number(delivery[i].cost);
                     amount = basicamt + extraamt + extadeliverycharges;
                     totalamt = amount;
                 }
