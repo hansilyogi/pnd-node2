@@ -479,11 +479,15 @@ router.post("/ordercalcV3", async (req, res, next) => {
         droplong,
         deliverytype,
         promocode,
+        parcelcontents
     } = req.body;
+
+    // console.log("OrderCalcV2 Request Body.................!!!!");
+    // console.log(req.body);
 
     let fromlocation = { latitude: Number(picklat), longitude: Number(picklong) };
     let tolocation = { latitude: Number(droplat), longitude: Number(droplong) };
-    // let prmcodes = await promoCodeSchema.find({ code: promocode });
+    let prmcodes = await promoCodeSchema.find({ code: promocode });
     let settings = await settingsSchema.find({});
     let delivery = await deliverytypesSchema.find({});
     let totaldistance = await GoogleMatrix(fromlocation, tolocation);
@@ -505,8 +509,7 @@ router.post("/ordercalcV3", async (req, res, next) => {
             extraamt = 0;
             extadeliverycharges = delivery[0].cost;
             amount = basicamt + extraamt + extadeliverycharges;
-            promoused = (amount * 50) / 100;
-            totalamt = amount - promoused;
+            totalamt = amount;
         } else {
             for (let i = 1; i < delivery.length; i++) {
                 if (deliverytype == delivery[i].title) {
@@ -516,8 +519,7 @@ router.post("/ordercalcV3", async (req, res, next) => {
                     extraamt = 0;
                     extadeliverycharges = delivery[i].cost;
                     amount = basicamt + extraamt + extadeliverycharges;
-                    promoused = (amount * 50) / 100;
-                    totalamt = amount - promoused;
+                    totalamt = amount;
                 }
             }
         }
@@ -530,8 +532,7 @@ router.post("/ordercalcV3", async (req, res, next) => {
             extraamt = remdis * settings[0].PerKM;
             extadeliverycharges = delivery[0].cost;
             amount = basicamt + extraamt + extadeliverycharges;
-            promoused = (amount * 50) / 100;
-            totalamt = amount - promoused;
+            totalamt = amount;
         } else {
             for (let i = 1; i < delivery.length; i++) {
                 if (deliverytype == delivery[i].title) {
@@ -542,23 +543,54 @@ router.post("/ordercalcV3", async (req, res, next) => {
                     extraamt = remdis * settings[0].PerKM;
                     extadeliverycharges = delivery[i].cost;
                     amount = basicamt + extraamt + extadeliverycharges;
-                    promoused = (amount * 50) / 100 ;
-                    totalamt = amount - promoused;
+                    totalamt = amount;
                 }
             }
         }
     }
 
+    let distamt = Number(basicamt.toFixed(2)) + Number(extraamt.toFixed(2));
+    distamt = (Math.round(distamt) % 10) > 5 ? round(distamt, 10) : round(distamt, 5);
+    let note;
+    //Find Parcel Content From Database
+    let parcelContentsList = [];
+    for (let e = 0; e < parcelcontents.length; e++) {
+        let data = await categorySchema.findOne({ title: parcelcontents[e] });
+        if (e == 0) {
+            note = data.note;
+        }
+        parcelContentsList.push(data);
+    }
+    
+    //Find ExtraCharges
+    let sortParcelContents = arraySort(parcelContentsList, 'price', { reverse: true });
+    let extracharges = 0;
+    for (let a = 0; a < sortParcelContents.length; a++) {
+        extracharges = extracharges + sortParcelContents[a].price;
+    }
+
+    let amt = Number(distamt) + extracharges + Math.ceil(extadeliverycharges.toFixed(2));
+    promoused = prmcodes.length != 0 ? (amt * prmcodes[0].discount) / 100 : 0;
+    let netamount = amt - Math.ceil(promoused.toFixed(2));
+
+    //TESTING FCMTOKEN
+    let AdminMobile = await settingsSchema.find({}).select('AdminMObile1 AdminMObile2 AdminMObile3 AdminMObile4 AdminMObile5 -_id');
+    console.log("Admin numbers-------------------------------------------------");
+    let AdminNumber1 = AdminMobile[0].AdminMObile1; 
+    let AdminNumber2 = AdminMobile[0].AdminMObile2; 
+    let AdminNumber3 = AdminMobile[0].AdminMObile3; 
+    let AdminNumber4 = AdminMobile[0].AdminMObile4; 
+    let AdminNumber5 = AdminMobile[0].AdminMObile5;
+    
     let dataset = [{
-        totaldistance: totaldistance.toFixed(2),
-        basickm: basickm.toFixed(2),
-        basicamt: basicamt.toFixed(2),
-        extrakm: extrakm.toFixed(2),
-        extraamt: extraamt.toFixed(2),
-        extadeliverycharges: extadeliverycharges.toFixed(2),
-        amount: amount.toFixed(2),
-        promoused: promoused.toFixed(2),
-        totalamt: totalamt.toFixed(2),
+        note: note,
+        totaldistance: Math.round(totaldistance.toFixed(2)),
+        totaldistamt: Number(distamt),
+        extracharges: extracharges,
+        extadeliverycharges: Math.ceil(extadeliverycharges.toFixed(2)),
+        amount: amt,
+        promoused: Math.ceil(promoused.toFixed(2)),
+        totalamt: netamount
     },];
     // console.log(dataset);
 
