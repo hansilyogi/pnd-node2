@@ -570,7 +570,7 @@ router.post("/ordercalcV3", async (req, res, next) => {
     }
 
     let amt = Number(distamt) + extracharges + Math.ceil(extadeliverycharges.toFixed(2));
-    promoused = prmcodes.length != 0 ? (amt * prmcodes[0].discount) / 100 : 0;
+    promoused = (amt * 50) / 100;
     let netamount = amt - Math.ceil(promoused.toFixed(2));
 
     //TESTING FCMTOKEN
