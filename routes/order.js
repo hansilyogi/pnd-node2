@@ -479,15 +479,11 @@ router.post("/ordercalcV3", async (req, res, next) => {
         droplong,
         deliverytype,
         promocode,
-        parcelcontents
     } = req.body;
-
-    // console.log("OrderCalcV2 Request Body.................!!!!");
-    console.log(req.body);
 
     let fromlocation = { latitude: Number(picklat), longitude: Number(picklong) };
     let tolocation = { latitude: Number(droplat), longitude: Number(droplong) };
-    let prmcodes = await promoCodeSchema.find({ code: promocode });
+    // let prmcodes = await promoCodeSchema.find({ code: promocode });
     let settings = await settingsSchema.find({});
     let delivery = await deliverytypesSchema.find({});
     let totaldistance = await GoogleMatrix(fromlocation, tolocation);
@@ -504,22 +500,24 @@ router.post("/ordercalcV3", async (req, res, next) => {
     if (totaldistance <= 5) {
         if (deliverytype == "Normal Delivery") {
             basickm = totaldistance;
-            basicamt = Number(settings[0].PerUnder5KM);
+            basicamt = settings[0].PerUnder5KM;
             extrakm = 0;
             extraamt = 0;
-            extadeliverycharges = Number(delivery[0].cost);
+            extadeliverycharges = delivery[0].cost;
             amount = basicamt + extraamt + extadeliverycharges;
-            totalamt = amount;
+            promoused = (amount * 50) / 100;
+            totalamt = amount - promoused;
         } else {
             for (let i = 1; i < delivery.length; i++) {
                 if (deliverytype == delivery[i].title) {
                     basickm = totaldistance;
-                    basicamt = Number(settings[0].PerUnder5KM);
+                    basicamt = settings[0].PerUnder5KM;
                     extrakm = 0;
                     extraamt = 0;
-                    extadeliverycharges = Number(delivery[i].cost);
+                    extadeliverycharges = delivery[i].cost;
                     amount = basicamt + extraamt + extadeliverycharges;
-                    totalamt = amount;
+                    promoused = (amount * 50) / 100;
+                    totalamt = amount - promoused;
                 }
             }
         }
@@ -527,70 +525,40 @@ router.post("/ordercalcV3", async (req, res, next) => {
         if (deliverytype == "Normal Delivery") {
             let remdis = totaldistance - 5;
             basickm = 5;
-            basicamt = Number(settings[0].PerUnder5KM);
+            basicamt = settings[0].PerUnder5KM;
             extrakm = remdis;
-            extraamt = remdis * Number(settings[0].PerKM);
-            extadeliverycharges = Number(delivery[0].cost);
+            extraamt = remdis * settings[0].PerKM;
+            extadeliverycharges = delivery[0].cost;
             amount = basicamt + extraamt + extadeliverycharges;
-            totalamt = amount;
+            promoused = (amount * 50) / 100;
+            totalamt = amount - promoused;
         } else {
             for (let i = 1; i < delivery.length; i++) {
                 if (deliverytype == delivery[i].title) {
                     let remdis = totaldistance - 5;
                     basickm = 5;
-                    basicamt = Number(settings[0].PerUnder5KM);
+                    basicamt = settings[0].PerUnder5KM;
                     extrakm = remdis;
-                    extraamt = remdis * Number(settings[0].PerKM);
-                    extadeliverycharges = Number(delivery[i].cost);
+                    extraamt = remdis * settings[0].PerKM;
+                    extadeliverycharges = delivery[i].cost;
                     amount = basicamt + extraamt + extadeliverycharges;
-                    totalamt = amount;
+                    promoused = (amount * 50) / 100 ;
+                    totalamt = amount - promoused;
                 }
             }
         }
     }
 
-    let distamt = Number(basicamt.toFixed(2)) + Number(extraamt.toFixed(2));
-    distamt = (Math.round(distamt) % 10) > 5 ? round(distamt, 10) : round(distamt, 5);
-    let note;
-    //Find Parcel Content From Database
-    let parcelContentsList = [];
-    for (let e = 0; e < parcelcontents.length; e++) {
-        let data = await categorySchema.findOne({ title: parcelcontents[e] });
-        if (e == 0) {
-            note = data.note;
-        }
-        parcelContentsList.push(data);
-    }
-    
-    //Find ExtraCharges
-    let sortParcelContents = arraySort(parcelContentsList, 'price', { reverse: true });
-    let extracharges = 0;
-    for (let a = 0; a < sortParcelContents.length; a++) {
-        extracharges = extracharges + sortParcelContents[a].price;
-    }
-
-    let amt = Number(distamt) + extracharges + Math.ceil(extadeliverycharges.toFixed(2));
-    promoused = (amt * 50) / 100 ;
-    let netamount = amt - Math.ceil(promoused.toFixed(2));
-
-    //TESTING FCMTOKEN
-    let AdminMobile = await settingsSchema.find({}).select('AdminMObile1 AdminMObile2 AdminMObile3 AdminMObile4 AdminMObile5 -_id');
-    console.log("Admin numbers-------------------------------------------------");
-    let AdminNumber1 = AdminMobile[0].AdminMObile1; 
-    let AdminNumber2 = AdminMobile[0].AdminMObile2; 
-    let AdminNumber3 = AdminMobile[0].AdminMObile3; 
-    let AdminNumber4 = AdminMobile[0].AdminMObile4; 
-    let AdminNumber5 = AdminMobile[0].AdminMObile5;
-    
     let dataset = [{
-        note: note,
-        totaldistance: Math.round(totaldistance.toFixed(2)),
-        totaldistamt: Number(distamt),
-        extracharges: extracharges,
-        extadeliverycharges: Math.ceil(extadeliverycharges.toFixed(2)),
-        amount: amt,
-        promoused: Math.ceil(promoused.toFixed(2)),
-        totalamt: netamount
+        totaldistance: totaldistance.toFixed(2),
+        basickm: basickm.toFixed(2),
+        basicamt: basicamt.toFixed(2),
+        extrakm: extrakm.toFixed(2),
+        extraamt: extraamt.toFixed(2),
+        extadeliverycharges: extadeliverycharges.toFixed(2),
+        amount: amount.toFixed(2),
+        promoused: promoused.toFixed(2),
+        totalamt: totalamt.toFixed(2),
     },];
     // console.log(dataset);
 
