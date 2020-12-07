@@ -483,7 +483,7 @@ router.post("/ordercalcV3", async (req, res, next) => {
     } = req.body;
 
     // console.log("OrderCalcV2 Request Body.................!!!!");
-    // console.log(req.body);
+    console.log(req.body);
 
     let fromlocation = { latitude: Number(picklat), longitude: Number(picklong) };
     let tolocation = { latitude: Number(droplat), longitude: Number(droplong) };
@@ -570,7 +570,7 @@ router.post("/ordercalcV3", async (req, res, next) => {
     }
 
     let amt = Number(distamt) + extracharges + Math.ceil(extadeliverycharges.toFixed(2));
-    promoused = prmcodes.length != 0 ? (amt * 50) / 100 : 0;
+    promoused = (amt * 50) / 100 ;
     let netamount = amt - Math.ceil(promoused.toFixed(2));
 
     //TESTING FCMTOKEN
