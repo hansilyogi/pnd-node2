@@ -25,7 +25,7 @@ const orderSettingsSchema = mongoose.Schema({
   },
   NewUserprice :{
     type : Number,
-  }
+  },
 });
 
 module.exports = mongoose.model("Settings", orderSettingsSchema);

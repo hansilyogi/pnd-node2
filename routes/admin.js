@@ -260,6 +260,7 @@ router.post("/updatesetttings", async function (req, res, next) {
         AdminMObile4,
         AdminMObile5,
         NewUserUnderKm,
+        NewUserprice,
     } = req.body;
 
     // var initialTime = moment(FromTime);
@@ -298,6 +299,7 @@ router.post("/updatesetttings", async function (req, res, next) {
                 AdminMObile4: AdminMObile4,
                 AdminMObile5: AdminMObile5,
                 NewUserUnderKm: NewUserUnderKm,
+                NewUserprice : NewUserprice,
             };
             await settingsSchema.findByIdAndUpdate(id, updatedsettings);
             res
