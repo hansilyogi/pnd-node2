@@ -100,6 +100,9 @@ const orderSchema = mongoose.Schema({
         type: Number,
         required: true,
     },
+    discountPercentage :{
+        type : Number,
+    },
     additionalAmount: {
         type: Number,
         required: true,

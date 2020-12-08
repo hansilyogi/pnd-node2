@@ -443,11 +443,11 @@ router.post("/ordercalcV2", async (req, res, next) => {
         extracharges = extracharges + sortParcelContents[a].price;
     }
 
-    let amt = Number(distamt) + extracharges + Math.ceil(extadeliverycharges.toFixed(2));
-    promoused = prmcodes.length != 0 ? (amt * prmcodes[0].discount) / 100 : 0;
-    let netamount = amt - Math.ceil(promoused.toFixed(2));
-
-    //TESTING FCMTOKEN
+        let amt = Number(distamt) + extracharges + Math.ceil(extadeliverycharges.toFixed(2));
+        promoused = prmcodes.length != 0 ? (amt * prmcodes[0].discount) / 100 : 0;
+        let netamount = amt - Math.ceil(promoused.toFixed(2));
+    
+        //TESTING FCMTOKEN
     let AdminMobile = await settingsSchema.find({}).select('AdminMObile1 AdminMObile2 AdminMObile3 AdminMObile4 AdminMObile5 -_id');
     console.log("Admin numbers-------------------------------------------------");
     let AdminNumber1 = AdminMobile[0].AdminMObile1; 
@@ -481,6 +481,8 @@ router.post("/ordercalcV3", async (req, res, next) => {
         promocode,
         parcelcontents
     } = req.body;
+
+    // var status = await orderSchema.find(customerId);
 
     // console.log("OrderCalcV2 Request Body.................!!!!");
     // console.log(req.body);
@@ -584,13 +586,13 @@ router.post("/ordercalcV3", async (req, res, next) => {
     
     let dataset = [{
         note: note,
-        totaldistance: Math.round(totaldistance.toFixed(2)),
+        totaldistance: (totaldistance.toFixed(2)),
         totaldistamt: Number(distamt),
         extracharges: extracharges,
         extadeliverycharges: Math.ceil(extadeliverycharges.toFixed(2)),
-        amount: amt,
+        amount: amt.toFixed(2),
         promoused: Math.ceil(promoused.toFixed(2)),
-        totalamt: netamount
+        totalamt: netamount.toFixed(2)
     },];
     // console.log(dataset);
 
@@ -695,6 +697,7 @@ router.post("/newoder", orderimg.single("orderimg"), async function (
                 promoCode: promoCode,
                 amount: amount,
                 discount: promocode[0].discount,
+                discountPercentage : discountPercentage,
                 additionalAmount: additionalAmount,
                 finalAmount: finalAmount - newUserDiscount,
                 status: "Order Processing",
@@ -734,6 +737,7 @@ router.post("/newoder", orderimg.single("orderimg"), async function (
                 promoCode: promoCode,
                 amount: amount,
                 discount: discount,
+                discountPercentage : discountPercentage,
                 additionalAmount: additionalAmount,
                 finalAmount: finalAmount,
                 status: "Order Processing",
