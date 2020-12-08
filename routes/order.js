@@ -637,6 +637,7 @@ router.post("/newoder", orderimg.single("orderimg"), async function (
         promoCode,
         amount,
         discount,
+        discountPercentage,
         additionalAmount,
         finalAmount,
         schedualDateTime,
@@ -661,7 +662,7 @@ router.post("/newoder", orderimg.single("orderimg"), async function (
             var promocode = await promoCodeSchema.find({ isForNewUser: true });
             console.log(promocode);
             let discountPercentage = parseFloat(promocode[0].discount);
-            var newUserDiscount = 0
+            var newUserDiscount = 0;
             newUserDiscount = (parseFloat(finalAmount) * discountPercentage)/100;
             console.log("Yeahhhhhhhhhhhhhhhhhhh....................................");
             console.log(newUserDiscount);
@@ -696,7 +697,7 @@ router.post("/newoder", orderimg.single("orderimg"), async function (
                 collectCash: collectCash,
                 promoCode: promoCode,
                 amount: amount,
-                discount: promocode[0].discount,
+                discount: discount,
                 discountPercentage : discountPercentage,
                 additionalAmount: additionalAmount,
                 finalAmount: finalAmount - newUserDiscount,
