@@ -652,16 +652,28 @@ router.post("/newoder", orderimg.single("orderimg"), async function (
         
         let a = Object.keys(UserOrders).map((key) => [Number(key), UserOrders[key]]);
         console.log("------------------------------------nnnnnnnnnnnnnnnnnnnnnnnnnnn");
+        console.log("asdad");
+        console.log(typeof(discount));
+        console.log(discount);
         // console.log(a);
         console.log(a.length);
         // console.log(UserOrders);
         var promoValidUnderKm = await settingsSchema.find().select("NewUserUnderKm");
         // console.log(promoValidUnderKm);
+        console.log("dpdistance");
         console.log(dpDistance);
+        console.log("a.length");
+        console.log(a.length);
+        console.log("promoValidUnderKm");
+        console.log(promoValidUnderKm);
         if(a.length <=6 && dpDistance <= promoValidUnderKm){
             var promocode = await promoCodeSchema.find({ isForNewUser: true });
+            console.log("promocode");
             console.log(promocode);
-            let discountPercentage = parseFloat(promocode[0].discount);
+           let discountPercentage = parseFloat(promocode[0].discount);
+            // console.log(" discount" + discountPercentage);
+            console.log("discountPercentage");
+            console.log(discountPercentage);
             var newUserDiscount = 0;
             newUserDiscount = (parseFloat(finalAmount) * discountPercentage)/100;
             console.log("Yeahhhhhhhhhhhhhhhhhhh....................................");
@@ -697,7 +709,7 @@ router.post("/newoder", orderimg.single("orderimg"), async function (
                 collectCash: collectCash,
                 promoCode: promoCode,
                 amount: amount,
-                discount: discount,
+                discount: promocode[0].discount,
                 discountPercentage : discountPercentage,
                 additionalAmount: additionalAmount,
                 finalAmount: finalAmount - newUserDiscount,

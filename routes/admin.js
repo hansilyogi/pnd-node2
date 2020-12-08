@@ -473,7 +473,7 @@ router.post("/completed_orders", async function (req, res, next) {
         let completeOrders = await orderSchema
             .find({ status: "Order Delivered", isActive: false })
             .populate(
-                "courierId[]",
+                "courierId",
                 "firstName lastName fcmToken mobileNo accStatus transport isVerified"
             )
             .populate("customerId");
