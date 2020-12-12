@@ -135,6 +135,10 @@ const orderSchema = mongoose.Schema({
     },
     orderType: {
         type: String
+    },
+    extraTime: {
+        type: mongoose.Types.ObjectId, 
+        ref: "ExtraTime",
     }
 });
 

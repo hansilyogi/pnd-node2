@@ -470,21 +470,26 @@ router.post("/orders", async function (req, res, next) {
 router.post("/completed_orders", async function (req, res, next) {
     try {
         let newdataset = [];
-
+        console.log("1");
+        let mysort = { dateTime: -1 };
         //completed order API 
         let completeOrders = await orderSchema
             .find({ status: "Order Delivered", isActive: false })
             .populate(
-                "courierId[]",
+                "courierId",
                 "firstName lastName fcmToken mobileNo accStatus transport isVerified"
             )
-            .populate("customerId");
+            .populate("customerId")
+            .sort(mysort);
+
+        // console.log(completeOrders);
 
         let orderscomplete = [];
         for (let i = 0; i < completeOrders.length; i++) {
             let datadate = await ExtatimeSchema.find({
                 orderId: completeOrders[i]._id,
             });
+            // console.log("2......................................................."+ i);
             orderscomplete.push({
                 starttime: datadate[0].dateTime,
                 endTime: datadate[0].deliverytime != null ? datadate[0].deliverytime : null,
@@ -492,18 +497,63 @@ router.post("/completed_orders", async function (req, res, next) {
             });
         }
 
-        //completeOrders: orderscomplete,
-        newdataset.push({
-            completeOrders: orderscomplete,
-        });
+        // completeOrders: orderscomplete,
+        // newdataset.push({
+        //     completeOrders: orderscomplete,
+        // });
         // console.log(newdataset);
         res
             .status(200)
-            .json({ Message: "Order Found!", Data: newdataset, IsSuccess: true });
+            .json({ Message: "Order Found!", Count: completeOrders.length , Data: orderscomplete, IsSuccess: true });
     } catch (err) {
         res.status(500).json({ Message: err.message, Data: 0, IsSuccess: false });
     }
 });
+
+router.post("/currentorder", async function (req, res, next) {
+    try {
+        let newdataset = [];
+        console.log("1");
+        let mysort = { dateTime: -1 };
+        //completed order API 
+        let completeOrders = await orderSchema
+            .find({ status: "Order Delivered", isActive: false })
+            .populate(
+                "courierId",
+                "firstName lastName fcmToken mobileNo accStatus transport isVerified"
+            )
+            .populate("customerId")
+            .sort(mysort)
+            .limit(100);
+
+        // console.log(completeOrders);
+
+        let orderscomplete = [];
+        for (let i = 0; i < completeOrders.length; i++) {
+            let datadate = await ExtatimeSchema.find({
+                orderId: completeOrders[i]._id,
+            });
+            // console.log("2......................................................."+ i);
+            orderscomplete.push({
+                starttime: datadate[0].dateTime,
+                endTime: datadate[0].deliverytime != null ? datadate[0].deliverytime : null,
+                completeOrders: completeOrders[i],
+            });
+        }
+
+        // completeOrders: orderscomplete,
+        // newdataset.push({
+        //     completeOrders: orderscomplete,
+        // });
+        // console.log(newdataset);
+        res
+            .status(200)
+            .json({ Message: "Order Found!", Count: completeOrders.length , Data: orderscomplete, IsSuccess: true });
+    } catch (err) {
+        res.status(500).json({ Message: err.message, Data: 0, IsSuccess: false });
+    }
+});
+
 
 //cancel Order
 router.post("/cancelOrder", async function (req, res, next) {
