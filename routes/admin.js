@@ -528,6 +528,29 @@ router.post("/cancelOrder", async function (req, res, next) {
     }
 });
 
+router.post("/restoreOrder", async function (req, res, next) {
+    const id = req.body.id;
+    try {
+        let orderupdate = await orderSchema.find({ _id: id, isActive: false });
+        if (orderupdate.length == 1) {
+            await orderSchema.findOneAndUpdate({ _id: id }, { status: "Order Processing", isActive: true });
+            res
+                .status(200)
+                .json({ Message: "Order Restored!", Data: 1, IsSuccess: true });
+        } 
+        else{
+            res.status(200).json({
+                Message: "Unable to Restore Order!",
+                Data: 0,
+                IsSuccess: true,
+            });
+        }
+    } catch(err){
+        res.status(500).json({ Message: err.message, Data: 0, IsSuccess: false });
+    }
+});
+
+
 //list of couriers boys
 router.post("/couriers", async function (req, res, next) {
     try {
@@ -1830,9 +1853,12 @@ router.post("/getAllEmployee" , async function(req,res,next){
 
 router.post("/getBusinessOfDay", async function(req,res,next){
     const { startdate , enddate } = req.body;
+    console.log(req.body);
     try {
         let date1 = convertStringDateToISO(startdate);
         let date2 = convertStringDateToISO(enddate);
+        console.log(date1);
+        console.log(date2);
         var record = await orderSchema.find({ 
             courierId: courierId,
             status: "Order Delivered", 
@@ -1847,6 +1873,7 @@ router.post("/getBusinessOfDay", async function(req,res,next){
                     "firstName lastName fcmToken mobileNo accStatus transport isVerified"
             )
             .populate("customerId");
+            console.log(record);
     } catch (error) {
         res.status(500).json({ IsSuccess: false , Message: error.messag });
     }

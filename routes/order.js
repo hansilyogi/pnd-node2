@@ -344,6 +344,170 @@ router.post("/ordercalc", async (req, res, next) => {
     res.json({ Message: "Calculation Found!", Data: dataset, IsSuccess: true });
 });
 
+// router.post("/ordercalc", async (req, res, next) => {
+//     const {
+//         customerId,
+//         picklat,
+//         picklong,
+//         droplat,
+//         droplong,
+//         deliverytype,
+//         promocode,
+//     } = req.body;
+
+//     let fromlocation = { latitude: Number(picklat), longitude: Number(picklong) };
+//     let tolocation = { latitude: Number(droplat), longitude: Number(droplong) };
+//     let prmcodes = await promoCodeSchema.find({ code: promocode });
+//     let settings = await settingsSchema.find({});
+//     let delivery = await deliverytypesSchema.find({});
+//     let totaldistance = await GoogleMatrix(fromlocation, tolocation);
+
+//     let basickm = 0;
+//     let basicamt = 0;
+//     let extrakm = 0;
+//     let extraamt = 0;
+//     let extadeliverycharges = 0;
+//     let promoused = 0;
+//     let amount = 0;
+//     let totalamt = 0;
+
+//     var UserOrders = await orderSchema({
+//         customerId : mongoose.Types.ObjectId(customerId),
+//     });
+//     if(!UserOrders){
+//         console.log("1");
+//         if (totaldistance <= 5) {
+//             if (deliverytype == "Normal Delivery") {
+//                 basickm = totaldistance;
+//                 basicamt = settings[0].PerUnder5KM;
+//                 extrakm = 0;
+//                 extraamt = 0;
+//                 extadeliverycharges = delivery[0].cost;
+//                 amount = basicamt + extraamt + extadeliverycharges;
+//                 promoused =
+//                     prmcodes.length != 0 ? (amount * prmcodes[0].discount) / 100 : 0;
+//                 totalamt = amount - promoused;
+//             } else {
+//                 for (let i = 1; i < delivery.length; i++) {
+//                     if (deliverytype == delivery[i].title) {
+//                         basickm = totaldistance;
+//                         basicamt = settings[0].PerUnder5KM;
+//                         extrakm = 0;
+//                         extraamt = 0;
+//                         extadeliverycharges = delivery[i].cost;
+//                         amount = basicamt + extraamt + extadeliverycharges;
+//                         promoused =
+//                             prmcodes.length != 0 ? (amount * prmcodes[0].discount) / 100 : 0;
+//                         totalamt = amount - promoused;
+//                     }
+//                 }
+//             }
+//         } else {
+//             if (deliverytype == "Normal Delivery") {
+//                 let remdis = totaldistance - 5;
+//                 basickm = 5;
+//                 basicamt = settings[0].PerUnder5KM;
+//                 extrakm = remdis;
+//                 extraamt = remdis * settings[0].PerKM;
+//                 extadeliverycharges = delivery[0].cost;
+//                 amount = basicamt + extraamt + extadeliverycharges;
+//                 promoused =
+//                     prmcodes.length != 0 ? (amount * prmcodes[0].discount) / 100 : 0;
+//                 totalamt = amount - promoused;
+//             } else {
+//                 for (let i = 1; i < delivery.length; i++) {
+//                     if (deliverytype == delivery[i].title) {
+//                         let remdis = totaldistance - 5;
+//                         basickm = 5;
+//                         basicamt = settings[0].PerUnder5KM;
+//                         extrakm = remdis;
+//                         extraamt = remdis * settings[0].PerKM;
+//                         extadeliverycharges = delivery[i].cost;
+//                         amount = basicamt + extraamt + extadeliverycharges;
+//                         promoused =
+//                             prmcodes.length != 0 ? (amount * prmcodes[0].discount) / 100 : 0;
+//                         totalamt = amount - promoused;
+//                     }
+//                 }
+//             }
+//         }        
+//     }
+//     else{
+//         console.log("2");
+//         if (totaldistance <= 5) {
+//             if (deliverytype == "Normal Delivery") {
+//                 basickm = totaldistance;
+//                 basicamt = settings[0].NewUserprice;
+//                 extrakm = 0;
+//                 extraamt = 0;
+//                 extadeliverycharges = delivery[0].cost;
+//                 amount = basicamt + extraamt + extadeliverycharges;
+//                 promoused =
+//                     prmcodes.length != 0 ? (amount * prmcodes[0].discount) / 100 : 0;
+//                 totalamt = amount - promoused;
+//             } else {
+//                 for (let i = 1; i < delivery.length; i++) {
+//                     if (deliverytype == delivery[i].title) {
+//                         basickm = totaldistance;
+//                         basicamt = settings[0].NewUserprice;
+//                         extrakm = 0;
+//                         extraamt = 0;
+//                         extadeliverycharges = delivery[i].cost;
+//                         amount = basicamt + extraamt + extadeliverycharges;
+//                         promoused =
+//                             prmcodes.length != 0 ? (amount * prmcodes[0].discount) / 100 : 0;
+//                         totalamt = amount - promoused;
+//                     }
+//                 }
+//             }
+//         } else {
+//             if (deliverytype == "Normal Delivery") {
+//                 let remdis = totaldistance - 5;
+//                 basickm = 5;
+//                 basicamt = settings[0].NewUserprice;
+//                 extrakm = remdis;
+//                 extraamt = remdis * settings[0].PerKM;
+//                 extadeliverycharges = delivery[0].cost;
+//                 amount = basicamt + extraamt + extadeliverycharges;
+//                 promoused =
+//                     prmcodes.length != 0 ? (amount * prmcodes[0].discount) / 100 : 0;
+//                 totalamt = amount - promoused;
+//             } else {
+//                 for (let i = 1; i < delivery.length; i++) {
+//                     if (deliverytype == delivery[i].title) {
+//                         let remdis = totaldistance - 5;
+//                         basickm = 5;
+//                         basicamt = settings[0].NewUserprice;
+//                         extrakm = remdis;
+//                         extraamt = remdis * settings[0].PerKM;
+//                         extadeliverycharges = delivery[i].cost;
+//                         amount = basicamt + extraamt + extadeliverycharges;
+//                         promoused =
+//                             prmcodes.length != 0 ? (amount * prmcodes[0].discount) / 100 : 0;
+//                         totalamt = amount - promoused;
+//                     }
+//                 }
+//             }
+//         }
+//     }
+
+    
+
+//     let dataset = [{
+//         totaldistance: totaldistance.toFixed(2),
+//         basickm: basickm.toFixed(2),
+//         basicamt: basicamt.toFixed(2),
+//         extrakm: extrakm.toFixed(2),
+//         extraamt: extraamt.toFixed(2),
+//         extadeliverycharges: extadeliverycharges.toFixed(2),
+//         amount: amount.toFixed(2),
+//         promoused: promoused.toFixed(2),
+//         totalamt: totalamt.toFixed(2),
+//     },];
+
+//     res.json({ Message: "Calculation Found!", Data: dataset, IsSuccess: true });
+// });
+
 
 router.post("/ordercalcV2", async (req, res, next) => {
     const {
@@ -670,7 +834,7 @@ router.post("/newoder", orderimg.single("orderimg"), async function (
             var promocode = await promoCodeSchema.find({ isForNewUser: true });
             console.log("promocode");
             console.log(promocode);
-           let discountPercentage = parseFloat(promocode[0].discount);
+           let discountPercentage = (promocode[0].discount);
             // console.log(" discount" + discountPercentage);
             console.log("discountPercentage");
             console.log(discountPercentage);
