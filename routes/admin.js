@@ -528,18 +528,18 @@ router.post("/currentorder", async function (req, res, next) {
 
         // console.log(completeOrders);
 
-        let orderscomplete = [];
-        for (let i = 0; i < completeOrders.length; i++) {
-            let datadate = await ExtatimeSchema.find({
-                orderId: completeOrders[i]._id,
-            });
-            // console.log("2......................................................."+ i);
-            orderscomplete.push({
-                starttime: datadate[0].dateTime,
-                endTime: datadate[0].deliverytime != null ? datadate[0].deliverytime : null,
-                completeOrders: completeOrders[i],
-            });
-        }
+        // let orderscomplete = [];
+        // for (let i = 0; i < completeOrders.length; i++) {
+        //     let datadate = await ExtatimeSchema.find({
+        //         orderId: completeOrders[i]._id,
+        //     });
+        //     // console.log("2......................................................."+ i);
+        //     orderscomplete.push({
+        //         starttime: datadate[0].dateTime,
+        //         endTime: datadate[0].deliverytime != null ? datadate[0].deliverytime : null,
+        //         completeOrders: completeOrders[i],
+        //     });
+        // }
 
         // completeOrders: orderscomplete,
         // newdataset.push({
@@ -548,7 +548,7 @@ router.post("/currentorder", async function (req, res, next) {
         // console.log(newdataset);
         res
             .status(200)
-            .json({ Message: "Order Found!", Count: completeOrders.length , Data: orderscomplete, IsSuccess: true });
+            .json({ Message: "Order Found!", Count: completeOrders.length , Data: completeOrders, IsSuccess: true });
     } catch (err) {
         res.status(500).json({ Message: err.message, Data: 0, IsSuccess: false });
     }
