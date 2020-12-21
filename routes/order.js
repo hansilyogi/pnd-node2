@@ -989,7 +989,7 @@ router.post("/newoder", orderimg.single("orderimg"), async function (
     let newOrderNotification = `New Order Received 
     OrderID: ${newOrderData}
     Customer: ${newOrderCustomer[0].name}
-    Mobile: ${newOrderCustomer[0].mobileNo}  
+    Mobile: ${newOrderCustomer[0].mobileNo}
     PickUp: ${newOrderPickUp}`;
     console.log(newOrderNotification);
 

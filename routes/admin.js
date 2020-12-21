@@ -516,7 +516,7 @@ router.post("/currentorder", async function (req, res, next) {
         console.log("1");
         let mysort = { dateTime: -1 };
         //completed order API 
-        let completeOrders = await orderSchema
+        let currentorders = await orderSchema
             .find({ status: "Order Delivered", isActive: false })
             .populate(
                 "courierId",
@@ -526,28 +526,28 @@ router.post("/currentorder", async function (req, res, next) {
             .sort(mysort)
             .limit(100);
 
-        // console.log(completeOrders);
+        // console.log(currentorders);
 
-        // let orderscomplete = [];
-        // for (let i = 0; i < completeOrders.length; i++) {
-        //     let datadate = await ExtatimeSchema.find({
-        //         orderId: completeOrders[i]._id,
-        //     });
-        //     orderscomplete.push({
-        //         starttime: datadate[0].dateTime,
-        //         endTime: datadate[0].deliverytime != null ? datadate[0].deliverytime : null,
-        //         completeOrders: completeOrders[i],
-        //     });
-        // }
+        let orderscomplete = [];
+        for (let i = 0; i < currentorders.length; i++) {
+            let datadate = await ExtatimeSchema.find({
+                orderId: currentorders[i]._id,
+            });
+            orderscomplete.push({
+                starttime: datadate[0].dateTime,
+                endTime: datadate[0].deliverytime != null ? datadate[0].deliverytime : null,
+                currentorders: currentorders[i],
+            });
+        }
 
-        // completeOrders: orderscomplete,
+        // currentorders: orderscomplete,
         // newdataset.push({
-        //     completeOrders: orderscomplete,
+        //     currentorders: orderscomplete,
         // });
         // console.log(newdataset);
         res
             .status(200)
-            .json({ Message: "Order Found!", Count: completeOrders.length , Data: completeOrders, IsSuccess: true });
+            .json({ Message: "Order Found!", Count: currentorders.length , Data: orderscomplete, IsSuccess: true });
     } catch (err) {
         res.status(500).json({ Message: err.message, Data: 0, IsSuccess: false });
     }
